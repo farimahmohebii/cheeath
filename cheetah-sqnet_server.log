@@ -1,0 +1,312 @@
+Number of CPU cores: 4
+Using Eigen for Matmul
+Doing BaseOT ...
+using silent ot pack
+using silent ot pack
+using silent ot pack
+using silent ot pack
+After one-time setup, communication
+Thread i = 0, total data sent till now = 1748076
+Thread i = 1, total data sent till now = 1726247
+Thread i = 2, total data sent till now = 1726247
+Thread i = 3, total data sent till now = 1726247
+-----------Syncronizing-----------
+secret_share_mod: 137438953472 bitlength: 37
+backend: Ring-SilentOT-Cheetah
+-----------Syncronized - now starting execution-----------
+HomConv #1 called N=1, H=227, W=227, CI=3, FH=3, FW=3, CO=64, S=2, Padding VALID (0 0 0 0)
+Time in sec for current conv = [1.654] sent [49.8421] MB
+Maxpool 1 called N=1, H=56, W=56, C=64, ksizeH=3, ksizeW=3
+Time in sec for current maxpool = 13.955
+Relu #1 on 200704 points, truncate=1 by 12 bits
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Time in sec for current relu = 4.793
+HomConv #2 called N=1, H=56, W=56, CI=64, FH=1, FW=1, CO=16, S=1, Padding VALID (0 0 0 0)
+Time in sec for current conv = [0.119] sent [0.774555] MB
+Relu #3 on 50176 points, truncate=1 by 12 bits
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Time in sec for current relu = 0.143
+HomConv #3 called N=1, H=56, W=56, CI=16, FH=1, FW=1, CO=64, S=1, Padding VALID (0 0 0 0)
+Time in sec for current conv = [0.114] sent [3.0981] MB
+Relu #5 on 200704 points, truncate=1 by 12 bits
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Time in sec for current relu = 0.538
+HomConv #4 called N=1, H=56, W=56, CI=16, FH=3, FW=3, CO=64, S=1, Padding SAME (1 1 1 1)
+Time in sec for current conv = [0.236] sent [3.10364] MB
+Relu #7 on 200704 points, truncate=1 by 12 bits
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Time in sec for current relu = 0.568
+HomConv #5 called N=1, H=56, W=56, CI=128, FH=1, FW=1, CO=16, S=1, Padding VALID (0 0 0 0)
+Time in sec for current conv = [0.204] sent [0.774674] MB
+Relu #9 on 50176 points, truncate=1 by 12 bits
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Time in sec for current relu = 0.15
+HomConv #6 called N=1, H=56, W=56, CI=16, FH=1, FW=1, CO=64, S=1, Padding VALID (0 0 0 0)
+Time in sec for current conv = [0.112] sent [3.09813] MB
+Relu #11 on 200704 points, truncate=1 by 12 bits
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Time in sec for current relu = 0.548
+HomConv #7 called N=1, H=56, W=56, CI=16, FH=3, FW=3, CO=64, S=1, Padding SAME (1 1 1 1)
+Time in sec for current conv = [0.237] sent [3.10323] MB
+Relu #13 on 200704 points, truncate=1 by 12 bits
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Time in sec for current relu = 0.565
+Maxpool 2 called N=1, H=27, W=27, C=128, ksizeH=3, ksizeW=3
+Time in sec for current maxpool = 8.523
+HomConv #8 called N=1, H=27, W=27, CI=128, FH=1, FW=1, CO=32, S=1, Padding VALID (0 0 0 0)
+Time in sec for current conv = [0.161] sent [1.07393] MB
+Relu #15 on 23328 points, truncate=1 by 12 bits
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Time in sec for current relu = 0.072
+HomConv #9 called N=1, H=27, W=27, CI=32, FH=1, FW=1, CO=128, S=1, Padding VALID (0 0 0 0)
+Time in sec for current conv = [0.21] sent [4.29594] MB
+Relu #17 on 93312 points, truncate=1 by 12 bits
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Time in sec for current relu = 0.261
+HomConv #10 called N=1, H=27, W=27, CI=32, FH=3, FW=3, CO=128, S=1, Padding SAME (1 1 1 1)
+Time in sec for current conv = [0.232] sent [4.30251] MB
+Relu #19 on 93312 points, truncate=1 by 12 bits
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Time in sec for current relu = 0.285
+HomConv #11 called N=1, H=27, W=27, CI=256, FH=1, FW=1, CO=32, S=1, Padding VALID (0 0 0 0)
+Time in sec for current conv = [0.299] sent [1.07411] MB
+Relu #21 on 23328 points, truncate=1 by 12 bits
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Time in sec for current relu = 0.076
+HomConv #12 called N=1, H=27, W=27, CI=32, FH=1, FW=1, CO=128, S=1, Padding VALID (0 0 0 0)
+Time in sec for current conv = [0.222] sent [4.29564] MB
+Relu #23 on 93312 points, truncate=1 by 12 bits
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Time in sec for current relu = 0.26
+HomConv #13 called N=1, H=27, W=27, CI=32, FH=3, FW=3, CO=128, S=1, Padding SAME (1 1 1 1)
+Time in sec for current conv = [0.233] sent [4.30212] MB
+Relu #25 on 93312 points, truncate=1 by 12 bits
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Time in sec for current relu = 0.284
+Maxpool 3 called N=1, H=13, W=13, C=256, ksizeH=3, ksizeW=3
+Time in sec for current maxpool = 10.486
+HomConv #14 called N=1, H=13, W=13, CI=256, FH=1, FW=1, CO=48, S=1, Padding VALID (0 0 0 0)
+Time in sec for current conv = [0.113] sent [1.44071] MB
+Relu #27 on 8112 points, truncate=1 by 12 bits
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Time in sec for current relu = 0.033
+HomConv #15 called N=1, H=13, W=13, CI=48, FH=1, FW=1, CO=192, S=1, Padding VALID (0 0 0 0)
+Time in sec for current conv = [0.168] sent [5.76297] MB
+Relu #29 on 32448 points, truncate=1 by 12 bits
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Time in sec for current relu = 0.11
+HomConv #16 called N=1, H=13, W=13, CI=48, FH=3, FW=3, CO=192, S=1, Padding SAME (1 1 1 1)
+Time in sec for current conv = [0.196] sent [5.76805] MB
+Relu #31 on 32448 points, truncate=1 by 12 bits
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Time in sec for current relu = 0.121
+HomConv #17 called N=1, H=13, W=13, CI=384, FH=1, FW=1, CO=48, S=1, Padding VALID (0 0 0 0)
+Time in sec for current conv = [0.15] sent [1.44071] MB
+Relu #33 on 8112 points, truncate=1 by 12 bits
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Time in sec for current relu = 0.035
+HomConv #18 called N=1, H=13, W=13, CI=48, FH=1, FW=1, CO=192, S=1, Padding VALID (0 0 0 0)
+Time in sec for current conv = [0.175] sent [5.76348] MB
+Relu #35 on 32448 points, truncate=1 by 12 bits
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Time in sec for current relu = 0.108
+HomConv #19 called N=1, H=13, W=13, CI=48, FH=3, FW=3, CO=192, S=1, Padding SAME (1 1 1 1)
+Time in sec for current conv = [0.218] sent [5.76735] MB
+Relu #37 on 32448 points, truncate=1 by 12 bits
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Time in sec for current relu = 0.123
+HomConv #20 called N=1, H=13, W=13, CI=384, FH=1, FW=1, CO=64, S=1, Padding VALID (0 0 0 0)
+Time in sec for current conv = [0.192] sent [1.92099] MB
+Relu #39 on 10816 points, truncate=1 by 12 bits
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Time in sec for current relu = 0.045
+HomConv #21 called N=1, H=13, W=13, CI=64, FH=1, FW=1, CO=256, S=1, Padding VALID (0 0 0 0)
+Time in sec for current conv = [0.258] sent [7.68435] MB
+Relu #41 on 43264 points, truncate=1 by 12 bits
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Time in sec for current relu = 0.148
+HomConv #22 called N=1, H=13, W=13, CI=64, FH=3, FW=3, CO=256, S=1, Padding SAME (1 1 1 1)
+Time in sec for current conv = [0.294] sent [7.69005] MB
+Relu #43 on 43264 points, truncate=1 by 12 bits
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Time in sec for current relu = 0.166
+HomConv #23 called N=1, H=13, W=13, CI=512, FH=1, FW=1, CO=64, S=1, Padding VALID (0 0 0 0)
+Time in sec for current conv = [0.247] sent [1.92107] MB
+Relu #45 on 10816 points, truncate=1 by 12 bits
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Time in sec for current relu = 0.048
+HomConv #24 called N=1, H=13, W=13, CI=64, FH=1, FW=1, CO=256, S=1, Padding VALID (0 0 0 0)
+Time in sec for current conv = [0.257] sent [7.68436] MB
+Relu #47 on 43264 points, truncate=1 by 12 bits
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Time in sec for current relu = 0.142
+HomConv #25 called N=1, H=13, W=13, CI=64, FH=3, FW=3, CO=256, S=1, Padding SAME (1 1 1 1)
+Time in sec for current conv = [0.324] sent [7.68998] MB
+Relu #49 on 43264 points, truncate=1 by 12 bits
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Time in sec for current relu = 0.165
+HomConv #26 called N=1, H=13, W=13, CI=512, FH=1, FW=1, CO=1000, S=1, Padding VALID (0 0 0 0)
+Time in sec for current conv = [3.586] sent [30.0158] MB
+Relu #51 on 169000 points, truncate=1 by 12 bits
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Time in sec for current relu = 0.57
+AvgPool 1 called N=1, H=1, W=1, C=1000, ksizeH=13, ksizeW=13
+Time in sec for current avgpool = 0.059
+ArgMax 1 called, s1=1, s2=1000
+Elapsed wall time: 63.6184 seconds
+Elapsed CPU time: 124.7 seconds
+CPU usage: 49.0031 %
+Test end computation
+Elapsed time: 63.8977 seconds
+Estimated energy used: 62623.7 joules
+Thread i = 0, total data sent till now = 273451666
+Thread i = 1, total data sent till now = 15339225
+Thread i = 2, total data sent till now = 46158242
+Thread i = 3, total data sent till now = 15339654
+------------------------------------------------------
+------------------------------------------------------
+------------------------------------------------------
+Total time taken = 54129 milliseconds.
+Total data sent = 327.455 MiB.
+Number of rounds = 802
+Total comm (sent+received) = 469.344 MiB.
+------------------------------------------------------
+Average CPU usage across all segments: 32.5887 %
+Peak CPU usage during computation: 50.3442 %
+Total time in Conv = 10.211 seconds.
+Total time in MatMul = 0 seconds.
+Total time in BatchNorm = 0 seconds.
+Total time in Truncation = 0.212 seconds.
+Total time in Relu = 10.357 seconds.
+Total time in MaxPool = 32.964 seconds.
+Total time in AvgPool = 0.059 seconds.
+Total time in ArgMax = 0.013 seconds.
+Total time in MatAdd = 0 seconds.
+Total time in MatAddBroadCast = 0 seconds.
+Total time in MulCir = 0 seconds.
+Total time in ScalarMul = 0 seconds.
+Total time in Sigmoid = 0 seconds.
+Total time in Tanh = 0 seconds.
+Total time in Sqrt = 0 seconds.
+Total time in NormaliseL2 = 0 seconds.
+------------------------------------------------------
+Conv data sent = 173.688 MiB.
+MatMul data sent = 0 MiB.
+BatchNorm data sent = 0 MiB.
+Truncation data sent = 2.42565 MiB.
+Relu data sent = 30.4024 MiB.
+Maxpool data sent = 77.2877 MiB.
+Avgpool data sent = 0.596691 MiB.
+ArgMax data sent = 0.0704584 MiB.
+MatAdd data sent = 0 MiB.
+MatAddBroadCast data sent = 0 MiB.
+MulCir data sent = 0 MiB.
+Sigmoid data sent = 0 MiB.
+Tanh data sent = 0 MiB.
+Sqrt data sent = 0 MiB.
+NormaliseL2 data sent = 0 MiB.
+------------------------------------------------------
+Conv data (sent+received) = 204.824 MiB.
+Conv data sent = 31.1355 MiB.
+MatMul data (sent+received) = 0 MiB.
+MatMul data sent = 0 MiB.
+BatchNorm data (sent+received) = 0 MiB.
+BatchNorm data sent = 0 MiB.
+Truncation data (sent+received) = 4.85137 MiB.
+Truncation data sent = 2.42572 MiB.
+Relu data (sent+received) = 60.8052 MiB.
+Relu data sent = 30.4029 MiB.
+Maxpool data (sent+received) = 154.575 MiB.
+Maxpool data sent = 77.2877 MiB.
+Avgpool data (sent+received) = 1.19409 MiB.
+Avgpool data sent = 0.597395 MiB.
+ArgMax data (sent+received) = 0.109762 MiB.
+ArgMax data sent = 0.0393038 MiB.
+MatAdd data (sent+received) = 0 MiB.
+MatAdd data sent = 0 MiB.
+MatAddBroadCast data (sent+received) = 0 MiB.
+MatAddBroadCast data sent = 0 MiB.
+MulCir data (sent+received) = 0 MiB.
+ScalarMul data (sent+received) = 0 MiB.
+Sigmoid data (sent+received) = 0 MiB.
+Tanh data (sent+received) = 0 MiB.
+Sqrt data (sent+received) = 0 MiB.
+NormaliseL2 data (sent+received) = 0 MiB.

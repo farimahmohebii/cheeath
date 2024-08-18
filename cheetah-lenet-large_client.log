@@ -1,0 +1,181 @@
+Number of CPU cores: 4
+Using Eigen for Matmul
+Doing BaseOT ...
+using silent ot pack
+using silent ot pack
+using silent ot pack
+using silent ot pack
+After one-time setup, communication
+Thread i = 0, total data sent till now = 1997767
+Thread i = 1, total data sent till now = 1726247
+Thread i = 2, total data sent till now = 1726247
+Thread i = 3, total data sent till now = 1726247
+-----------Syncronizing-----------
+secret_share_mod: 137438953472 bitlength: 37
+backend: Ring-SilentOT-Cheetah
+-----------Syncronized - now starting execution-----------
+HomConv #1 called N=1, H=28, W=28, CI=1, FH=5, FW=5, CO=32, S=1, Padding SAME (2 2 2 2)
+Time in sec for current conv = [0.06] sent [0.0595245] MB
+expect -1 but got 0
+expect -1 but got 0
+[32mConvolution Output Matches[0m
+Maxpool 1 called N=1, H=14, W=14, C=32, ksizeH=2, ksizeW=2
+Time in sec for current maxpool = 0.12
+Relu #1 on 6272 points, truncate=1 by 12 bits
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Time in sec for current relu = 0.016
+HomConv #2 called N=1, H=14, W=14, CI=32, FH=5, FW=5, CO=64, S=1, Padding SAME (2 2 2 2)
+Time in sec for current conv = [0.083] sent [0.178619] MB
+expect -60326130 but got -60326129
+expect 129703038 but got 129703039
+[32mConvolution Output Matches[0m
+Maxpool 2 called N=1, H=7, W=7, C=64, ksizeH=2, ksizeW=2
+Time in sec for current maxpool = 0.059
+Relu #3 on 3136 points, truncate=1 by 12 bits
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Time in sec for current relu = 0.008
+Time in sec for current matmul = 0.127
+-39716220465 => -39716220466
+-53985957993 => -53985957994
+15975895429 => 15975895428
+-10742240171 => -10742240172
+43461761412 => 43461761411
+-58514154001 => -58514154002
+-27462579636 => -27462579637
+23933893696 => 23933893695
+60045920440 => 60045920439
+14202875219 => 14202875218
+-7930941415 => -7930941416
+34472060187 => 34472060186
+12976637487 => 12976637486
+-42840833810 => -42840833811
+31588848643 => 31588848642
+35997794790 => 35997794789
+57782737052 => 57782737051
+6341395688 => 6341395687
+44616775488 => 44616775487
+-21914404840 => -21914404841
+1581327343 => 1581327342
+-18578633271 => -18578633272
+-59804601065 => -59804601066
+-34262159654 => -34262159655
+42127191807 => 42127191806
+-25845699008 => -25845699009
+6119770718 => 6119770717
+-62642263758 => -62642263759
+-22732603599 => -22732603600
+-16158904497 => -16158904498
+59462849204 => 59462849203
+-4077036911 => -4077036912
+-26285252021 => -26285252022
+-63107232704 => -63107232705
+-8368173381 => -8368173382
+28384393407 => 28384393406
+58861328377 => 58861328376
+-61584837753 => -61584837754
+45263600818 => 45263600817
+63272521397 => 63272521396
+-26091016920 => -26091016921
+-10175982503 => -10175982504
+-5142454221 => -5142454222
+-55442421131 => -55442421132
+38153663099 => 38153663098
+20402524181 => 20402524180
+41303866928 => 41303866927
+-16667755965 => -16667755966
+-63370349922 => -63370349923
+11494400116 => 11494400115
+39540945776 => 39540945775
+-40673072611 => -40673072612
+-68412939589 => -68412939590
+-13132425916 => -13132425917
+20629373570 => 20629373569
+-57477414721 => -57477414722
+67254650910 => 67254650909
+-50918161092 => -50918161093
+-61464339564 => -61464339565
+22940041122 => 22940041121
+63941533449 => 63941533448
+-4918147678 => -4918147679
+15321038893 => 15321038892
+14269820089 => 14269820088
+-32408822065 => -32408822066
+60346169746 => 60346169745
+[32mMatMul Output Matches[0m
+Relu #5 on 512 points, truncate=1 by 12 bits
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Mill dotrunc 1 on 16 bits using b = 4
+Time in sec for current relu = 0.002
+Time in sec for current matmul = 0.007
+-53828083859 => -53828083860
+[32mMatMul Output Matches[0m
+Truncate #1 on 10 points by 12 bits
+Elapsed wall time: 9.04511 seconds
+Elapsed CPU time: 8.77 seconds
+CPU usage: 24.2396 %
+Test end computation
+Elapsed time: 9.0557 seconds
+Estimated energy used: 4390.13 joules
+Thread i = 0, total data sent till now = 3668478
+Thread i = 1, total data sent till now = 2098603
+Thread i = 2, total data sent till now = 1836387
+Thread i = 3, total data sent till now = 2098639
+------------------------------------------------------
+------------------------------------------------------
+------------------------------------------------------
+Total time taken = 589 milliseconds.
+Total data sent = 2.4086 MiB.
+Number of rounds = 119
+Total comm (sent+received) = (see SERVER OUTPUT)
+------------------------------------------------------
+Total time in Conv = 0.143 seconds.
+Total time in MatMul = 0.134 seconds.
+Total time in BatchNorm = 0 seconds.
+Total time in Truncation = 0.001 seconds.
+Total time in Relu = 0.026 seconds.
+Total time in MaxPool = 0.179 seconds.
+Total time in AvgPool = 0 seconds.
+Total time in ArgMax = 0 seconds.
+Total time in MatAdd = 0 seconds.
+Total time in MatAddBroadCast = 0 seconds.
+Total time in MulCir = 0 seconds.
+Total time in ScalarMul = 0 seconds.
+Total time in Sigmoid = 0 seconds.
+Total time in Tanh = 0 seconds.
+Total time in Sqrt = 0 seconds.
+Total time in NormaliseL2 = 0 seconds.
+------------------------------------------------------
+Conv data sent = 0.238144 MiB.
+MatMul data sent = 1.25013 MiB.
+BatchNorm data sent = 0 MiB.
+Truncation data sent = 0.012104 MiB.
+Relu data sent = 0.143547 MiB.
+Maxpool data sent = 0.764671 MiB.
+Avgpool data sent = 0 MiB.
+ArgMax data sent = 0 MiB.
+MatAdd data sent = 0 MiB.
+MatAddBroadCast data sent = 0 MiB.
+MulCir data sent = 0 MiB.
+Sigmoid data sent = 0 MiB.
+Tanh data sent = 0 MiB.
+Sqrt data sent = 0 MiB.
+NormaliseL2 data sent = 0 MiB.
+------------------------------------------------------
+5457762
+4997596
+-2047938
+-8908951
+-8859282
+20416004
+15162541
+968741
+9519779
+3538667

@@ -25,12 +25,25 @@ SOFTWARE.
 #include "cleartext_library_fixed_uniform.h"
 #include "functionalities_uniform.h"
 #include "library_fixed_common.h"
-
+#include <iostream>
+#include <chrono>
+#include <fstream>
+#include <string>
+#include <sstream>
+#include <vector>
+#include <thread>
 #define LOG_LAYERWISE
 #define VERIFY_LAYERWISE
 #undef VERIFY_LAYERWISE // undefine this to turn OFF the verifcation
 // #undef LOG_LAYERWISE // undefine this to turn OFF the log
-
+std::chrono::high_resolution_clock::time_point startWallTime;
+auto start = std::chrono::high_resolution_clock::now();
+long startCpuTime;
+//unsigned int numCores;
+static std::vector<double> segmentCpuUsages;
+static int numCores = std::thread::hardware_concurrency(); 
+ auto globalStartWallTime = std::chrono::high_resolution_clock::now();
+static double peakCpuUsage = 0; 
 #ifdef SCI_HE
 uint64_t prime_mod = sci::default_prime_mod.at(41);
 #elif SCI_OT
@@ -39,9 +52,51 @@ uint64_t moduloMask = prime_mod - 1;
 uint64_t moduloMidPt = prime_mod / 2;
 #endif
 
+
+
+// Function to get CPU time used by the current process
+long GetCpuTime() {
+    std::ifstream procStat("/proc/self/stat");
+    std::string line;
+    std::getline(procStat, line);
+    std::istringstream iss(line);
+
+    std::vector<std::string> stats;
+    std::string stat;
+    while (iss >> stat) {
+        stats.push_back(stat);
+    }
+
+    // The 14th and 15th values are utime and stime respectively
+    long utime = std::stol(stats[13]);
+    long stime = std::stol(stats[14]);
+
+    return utime + stime;
+}
+
+
+long globalStartCpuTime = GetCpuTime();  // This should be set in a function if it depends on runtime initializ>
+void CaptureCpuUsage() {
+    auto currentWallTime = std::chrono::high_resolution_clock::now();
+    long currentCpuTime = GetCpuTime();
+
+    // Calculate elapsed times for this segment
+    std::chrono::duration<double> elapsedWallTime = currentWallTime - globalStartWallTime;
+    double elapsedCpuTime = static_cast<double>(currentCpuTime - globalStartCpuTime) / sysconf(_SC_CLK_TCK);
+
+    // Calculate CPU usage for this segment
+    double cpuUsage = (elapsedCpuTime / (elapsedWallTime.count() * numCores)) * 100.0;
+    segmentCpuUsages.push_back(cpuUsage);
+
+    // Update peak CPU usage if the current usage is higher
+    peakCpuUsage = std::max(peakCpuUsage, cpuUsage);
+}
 #if !USE_CHEETAH
 void MatMul2D(int32_t s1, int32_t s2, int32_t s3, const intType *A,
               const intType *B, intType *C, bool modelIsA) {
+      auto startWallTime = std::chrono::high_resolution_clock::now();
+    long startCpuTime = GetCpuTime();
+
 #ifdef LOG_LAYERWISE
   INIT_ALL_IO_DATA_SENT;
   INIT_TIMER;
@@ -263,6 +318,19 @@ void MatMul2D(int32_t s1, int32_t s2, int32_t s3, const intType *A,
     delete[] VC;
   }
 #endif
+auto endWallTime = std::chrono::high_resolution_clock::now();
+    long endCpuTime = GetCpuTime();
+
+    // Calculate elapsed times
+    std::chrono::duration<double> elapsedWallTime = endWallTime - startWallTime;
+    double elapsedCpuTime = static_cast<double>(endCpuTime - startCpuTime) / sysconf(_SC_CLK_TCK);
+
+    // Calculate and store CPU usage for this segment
+    double cpuUsage = (elapsedCpuTime / (elapsedWallTime.count() * numCores)) * 100.0;
+    segmentCpuUsages.push_back(cpuUsage);
+
+CaptureCpuUsage();
+
 }
 #endif
 
@@ -271,7 +339,12 @@ static void Conv2D(int32_t N, int32_t H, int32_t W, int32_t CI, int32_t FH,
                    int32_t zPadHRight, int32_t zPadWLeft, int32_t zPadWRight,
                    int32_t strideH, int32_t strideW, uint64_t *inputArr,
                    uint64_t *filterArr, uint64_t *outArr) {
-  int32_t reshapedFilterRows = CO;
+
+    // Start timing
+    auto startWallTime = std::chrono::high_resolution_clock::now();
+    long startCpuTime = GetCpuTime();
+  
+int32_t reshapedFilterRows = CO;
 
   int32_t reshapedFilterCols = ((FH * FW) * CI);
 
@@ -302,6 +375,24 @@ static void Conv2D(int32_t N, int32_t H, int32_t W, int32_t CI, int32_t FH,
   ClearMemSecret2(reshapedFilterRows, reshapedFilterCols, filterReshaped);
   ClearMemSecret2(reshapedIPRows, reshapedIPCols, inputReshaped);
   ClearMemSecret2(reshapedFilterRows, reshapedIPCols, matmulOP);
+
+
+// Stop timing
+    auto endWallTime = std::chrono::high_resolution_clock::now();
+    long endCpuTime = GetCpuTime();
+
+    // Calculate elapsed times
+    std::chrono::duration<double> elapsedWallTime = endWallTime - startWallTime;
+    double elapsedCpuTime = static_cast<double>(endCpuTime - startCpuTime) / sysconf(_SC_CLK_TCK);
+
+    // Calculate and store CPU usage for this segment
+    double cpuUsage = (elapsedCpuTime / (elapsedWallTime.count() * numCores)) * 100.0;
+    segmentCpuUsages.push_back(cpuUsage);
+
+    // Update peak CPU usage if the current usage is higher
+    peakCpuUsage = std::max(peakCpuUsage, cpuUsage);
+
+CaptureCpuUsage();
 }
 
 #if !USE_CHEETAH
@@ -312,6 +403,10 @@ void Conv2DWrapper(signedIntType N, signedIntType H, signedIntType W,
                    signedIntType zPadWRight, signedIntType strideH,
                    signedIntType strideW, intType *inputArr, intType *filterArr,
                    intType *outArr) {
+    // Start timing
+    auto startWallTime = std::chrono::high_resolution_clock::now();
+    long startCpuTime = GetCpuTime();
+
 #ifdef LOG_LAYERWISE
   INIT_ALL_IO_DATA_SENT;
   INIT_TIMER;
@@ -486,6 +581,25 @@ void Conv2DWrapper(signedIntType N, signedIntType H, signedIntType W,
     delete[] VoutputArr;
   }
 #endif
+
+
+// Stop timing
+    auto endWallTime = std::chrono::high_resolution_clock::now();
+    long endCpuTime = GetCpuTime();
+
+    // Calculate elapsed times
+    std::chrono::duration<double> elapsedWallTime = endWallTime - startWallTime;
+    double elapsedCpuTime = static_cast<double>(endCpuTime - startCpuTime) / sysconf(_SC_CLK_TCK);
+
+    // Calculate and store CPU usage for this segment
+    double cpuUsage = (elapsedCpuTime / (elapsedWallTime.count() * numCores)) * 100.0;
+    segmentCpuUsages.push_back(cpuUsage);
+
+    // Update peak CPU usage if the current usage is higher
+    peakCpuUsage = std::max(peakCpuUsage, cpuUsage);
+
+CaptureCpuUsage();
+
 }
 #endif
 
@@ -505,6 +619,12 @@ void Conv2DGroupWrapper(signedIntType N, signedIntType H, signedIntType W,
                         signedIntType strideW, signedIntType G,
                         intType *inputArr, intType *filterArr,
                         intType *outArr) {
+
+
+    // Start timing
+    auto startWallTime = std::chrono::high_resolution_clock::now();
+    long startCpuTime = GetCpuTime();
+
 #ifdef LOG_LAYERWISE
   INIT_ALL_IO_DATA_SENT;
   INIT_TIMER;
@@ -682,10 +802,36 @@ void ElemWiseActModelVectorMult(int32_t size, intType *inArr,
     delete[] VoutputArr;
   }
 #endif
+
+// Stop timing
+    auto endWallTime = std::chrono::high_resolution_clock::now();
+    long endCpuTime = GetCpuTime();
+
+    // Calculate elapsed times
+    std::chrono::duration<double> elapsedWallTime = endWallTime - startWallTime;
+    double elapsedCpuTime = static_cast<double>(endCpuTime - startCpuTime) / sysconf(_SC_CLK_TCK);
+
+    // Calculate and store CPU usage for this segment
+    double cpuUsage = (elapsedCpuTime / (elapsedWallTime.count() * numCores)) * 100.0;
+    segmentCpuUsages.push_back(cpuUsage);
+
+    // Update peak CPU usage if the current usage is higher
+    peakCpuUsage = std::max(peakCpuUsage, cpuUsage);
+
+CaptureCpuUsage();
+
+
 }
 #endif
 
 void ArgMax(int32_t s1, int32_t s2, intType *inArr, intType *outArr) {
+
+    // Start timing
+    auto startWallTime = std::chrono::high_resolution_clock::now();
+    long startCpuTime = GetCpuTime();
+
+
+
 #ifdef LOG_LAYERWISE
   INIT_ALL_IO_DATA_SENT;
   INIT_TIMER;
@@ -748,10 +894,191 @@ void ArgMax(int32_t s1, int32_t s2, intType *inArr, intType *outArr) {
     delete[] VoutArr;
   }
 #endif
+
+// Stop timing
+    auto endWallTime = std::chrono::high_resolution_clock::now();
+    long endCpuTime = GetCpuTime();
+
+    // Calculate elapsed times
+    std::chrono::duration<double> elapsedWallTime = endWallTime - startWallTime;
+    double elapsedCpuTime = static_cast<double>(endCpuTime - startCpuTime) / sysconf(_SC_CLK_TCK);
+
+    // Calculate and store CPU usage for this segment
+    double cpuUsage = (elapsedCpuTime / (elapsedWallTime.count() * numCores)) * 100.0;
+    segmentCpuUsages.push_back(cpuUsage);
+
+    // Update peak CPU usage if the current usage is higher
+    peakCpuUsage = std::max(peakCpuUsage, cpuUsage);
+
+CaptureCpuUsage();
+
+
+}
+void Min(int32_t size, intType *inArr, int32_t alpha, intType *outArr, int32_t sf, bool doTruncation) {
+  
+   // Start timing
+    auto startWallTime = std::chrono::high_resolution_clock::now();
+    long startCpuTime = GetCpuTime();
+
+intType *tempIn = new intType[size] ;
+  intType *tempOut = new intType[size] ;
+
+  intType affine ;
+  if (alpha < 0) {
+  	affine = ((intType)((int32_t)(-1)*alpha)) << sf ;
+  	affine = (intType)((-((signedIntType)1))*((signedIntType)affine)) ;
+  } else {
+  	affine = ((intType)alpha) << sf ;
+  }
+
+  for (int i = 0 ; i < size ; i++) {
+    if (party == SERVER)
+      tempIn[i] = affine - inArr[i] ;
+    else
+      tempIn[i] = -inArr[i] ;
+  }
+
+  Relu(size, tempIn, tempOut, sf, doTruncation) ;
+
+  for (int i = 0 ; i < size ; i++) {
+    if (party == SERVER)
+      outArr[i] = affine - tempOut[i] ;
+    else
+      outArr[i] = -tempOut[i] ;
+  }
+
+  delete[] tempIn ;
+  delete[] tempOut ;
+
+
+
+// Stop timing
+    auto endWallTime = std::chrono::high_resolution_clock::now();
+    long endCpuTime = GetCpuTime();
+
+    // Calculate elapsed times
+    std::chrono::duration<double> elapsedWallTime = endWallTime - startWallTime;
+    double elapsedCpuTime = static_cast<double>(endCpuTime - startCpuTime) / sysconf(_SC_CLK_TCK);
+
+    // Calculate and store CPU usage for this segment
+    double cpuUsage = (elapsedCpuTime / (elapsedWallTime.count() * numCores)) * 100.0;
+    segmentCpuUsages.push_back(cpuUsage);
+
+    // Update peak CPU usage if the current usage is higher
+    peakCpuUsage = std::max(peakCpuUsage, cpuUsage);
+
+CaptureCpuUsage();
+
+
 }
 
+void Max(int32_t size, intType *inArr, int32_t alpha, intType *outArr, int32_t sf, bool doTruncation) {
+  
+
+
+    // Start timing
+    auto startWallTime = std::chrono::high_resolution_clock::now();
+    long startCpuTime = GetCpuTime();
+
+
+intType *tempIn = new intType[size] ;
+  intType *tempOut = new intType[size] ;
+
+  intType affine ;
+  if (alpha < 0) {
+  	affine = ((intType)((int32_t)(-1)*alpha)) << sf ;
+  	affine = (intType)((-((signedIntType)1))*((signedIntType)affine)) ;
+  } else {
+  	affine = ((intType)alpha) << sf ;
+  }
+
+  for (int i = 0 ; i < size ; i++) {
+  	tempIn[i] = inArr[i] ;
+  	if (party == SERVER)
+  		tempIn[i] = tempIn[i] - affine ;
+  }
+
+  Relu(size, tempIn, tempOut, sf, doTruncation) ;
+
+  for (int i = 0 ; i < size ; i++) {
+  	outArr[i] = tempOut[i] ;
+    if (party == SERVER)
+       outArr[i] += affine ;
+  }
+
+  delete[] tempIn ;
+  delete[] tempOut ;
+
+
+
+
+// Stop timing
+    auto endWallTime = std::chrono::high_resolution_clock::now();
+    long endCpuTime = GetCpuTime();
+
+    // Calculate elapsed times
+    std::chrono::duration<double> elapsedWallTime = endWallTime - startWallTime;
+    double elapsedCpuTime = static_cast<double>(endCpuTime - startCpuTime) / sysconf(_SC_CLK_TCK);
+
+    // Calculate and store CPU usage for this segment
+    double cpuUsage = (elapsedCpuTime / (elapsedWallTime.count() * numCores)) * 100.0;
+    segmentCpuUsages.push_back(cpuUsage);
+
+    // Update peak CPU usage if the current usage is higher
+    peakCpuUsage = std::max(peakCpuUsage, cpuUsage);
+
+CaptureCpuUsage();
+
+}
+void HardSigmoid(int32_t size, intType *inArr, intType *outArr, int32_t sf, bool doTruncation) {
+
+
+    // Start timing
+    auto startWallTime = std::chrono::high_resolution_clock::now();
+    long startCpuTime = GetCpuTime();
+
+
+  intType *tmpIn = new intType[size] ;
+  intType *tmpIn1 = new intType[size] ;
+  for(int i=0;i<size;i++) {
+    if (party == SERVER)
+    	tmpIn[i] = inArr[i] + (intType)(3<<sf) ;
+    else
+    	tmpIn[i] = inArr[i] ;
+  }
+
+  ElemWiseVectorPublicDiv(size,tmpIn,6,tmpIn1);
+  Min(size, tmpIn1, (int32_t)1, tmpIn1, sf, doTruncation) ;
+  Max(size, tmpIn1, (int32_t)0, outArr, sf, doTruncation) ;
+
+  delete[] tmpIn ;
+  delete[] tmpIn1 ;
+
+
+// Stop timing
+    auto endWallTime = std::chrono::high_resolution_clock::now();
+    long endCpuTime = GetCpuTime();
+
+    // Calculate elapsed times
+    std::chrono::duration<double> elapsedWallTime = endWallTime - startWallTime;
+    double elapsedCpuTime = static_cast<double>(endCpuTime - startCpuTime) / sysconf(_SC_CLK_TCK);
+
+    // Calculate and store CPU usage for this segment
+    double cpuUsage = (elapsedCpuTime / (elapsedWallTime.count() * numCores)) * 100.0;
+    segmentCpuUsages.push_back(cpuUsage);
+
+    // Update peak CPU usage if the current usage is higher
+    peakCpuUsage = std::max(peakCpuUsage, cpuUsage);
+
+CaptureCpuUsage();
+}
 void Relu(int32_t size, intType *inArr, intType *outArr, int sf,
           bool doTruncation) {
+
+    // Start timing
+    auto startWallTime = std::chrono::high_resolution_clock::now();
+    long startCpuTime = GetCpuTime();
+
 #ifdef LOG_LAYERWISE
   INIT_ALL_IO_DATA_SENT;
   INIT_TIMER;
@@ -923,6 +1250,26 @@ void Relu(int32_t size, intType *inArr, intType *outArr, int sf,
   delete[] tempInp;
   delete[] tempOutp;
   delete[] msbShare;
+
+
+
+
+// Stop timing
+    auto endWallTime = std::chrono::high_resolution_clock::now();
+    long endCpuTime = GetCpuTime();
+
+    // Calculate elapsed times
+    std::chrono::duration<double> elapsedWallTime = endWallTime - startWallTime;
+    double elapsedCpuTime = static_cast<double>(endCpuTime - startCpuTime) / sysconf(_SC_CLK_TCK);
+
+    // Calculate and store CPU usage for this segment
+    double cpuUsage = (elapsedCpuTime / (elapsedWallTime.count() * numCores)) * 100.0;
+    segmentCpuUsages.push_back(cpuUsage);
+
+    // Update peak CPU usage if the current usage is higher
+    peakCpuUsage = std::max(peakCpuUsage, cpuUsage);
+
+CaptureCpuUsage();
 }
 
 void MaxPool(int32_t N, int32_t H, int32_t W, int32_t C, int32_t ksizeH,
@@ -930,6 +1277,14 @@ void MaxPool(int32_t N, int32_t H, int32_t W, int32_t C, int32_t ksizeH,
              int32_t zPadWLeft, int32_t zPadWRight, int32_t strideH,
              int32_t strideW, int32_t N1, int32_t imgH, int32_t imgW,
              int32_t C1, intType *inArr, intType *outArr) {
+
+
+
+    // Start timing
+    auto startWallTime = std::chrono::high_resolution_clock::now();
+    long startCpuTime = GetCpuTime();
+
+
 #ifdef LOG_LAYERWISE
   INIT_ALL_IO_DATA_SENT;
   INIT_TIMER;
@@ -1112,6 +1467,26 @@ void MaxPool(int32_t N, int32_t H, int32_t W, int32_t C, int32_t ksizeH,
     delete[] VoutArr;
   }
 #endif
+
+
+
+// Stop timing
+    auto endWallTime = std::chrono::high_resolution_clock::now();
+    long endCpuTime = GetCpuTime();
+
+    // Calculate elapsed times
+    std::chrono::duration<double> elapsedWallTime = endWallTime - startWallTime;
+    double elapsedCpuTime = static_cast<double>(endCpuTime - startCpuTime) / sysconf(_SC_CLK_TCK);
+
+    // Calculate and store CPU usage for this segment
+    double cpuUsage = (elapsedCpuTime / (elapsedWallTime.count() * numCores)) * 100.0;
+    segmentCpuUsages.push_back(cpuUsage);
+
+    // Update peak CPU usage if the current usage is higher
+    peakCpuUsage = std::max(peakCpuUsage, cpuUsage);
+
+CaptureCpuUsage();
+
 }
 
 void AvgPool(int32_t N, int32_t H, int32_t W, int32_t C, int32_t ksizeH,
@@ -1119,6 +1494,12 @@ void AvgPool(int32_t N, int32_t H, int32_t W, int32_t C, int32_t ksizeH,
              int32_t zPadWLeft, int32_t zPadWRight, int32_t strideH,
              int32_t strideW, int32_t N1, int32_t imgH, int32_t imgW,
              int32_t C1, intType *inArr, intType *outArr) {
+
+
+    // Start timing
+    auto startWallTime = std::chrono::high_resolution_clock::now();
+    long startCpuTime = GetCpuTime();
+
 #ifdef LOG_LAYERWISE
   INIT_ALL_IO_DATA_SENT;
   INIT_TIMER;
@@ -1293,9 +1674,34 @@ void AvgPool(int32_t N, int32_t H, int32_t W, int32_t C, int32_t ksizeH,
     delete[] VoutArr;
   }
 #endif
+
+
+
+// Stop timing
+    auto endWallTime = std::chrono::high_resolution_clock::now();
+    long endCpuTime = GetCpuTime();
+
+    // Calculate elapsed times
+    std::chrono::duration<double> elapsedWallTime = endWallTime - startWallTime;
+    double elapsedCpuTime = static_cast<double>(endCpuTime - startCpuTime) / sysconf(_SC_CLK_TCK);
+
+    // Calculate and store CPU usage for this segment
+    double cpuUsage = (elapsedCpuTime / (elapsedWallTime.count() * numCores)) * 100.0;
+    segmentCpuUsages.push_back(cpuUsage);
+
+    // Update peak CPU usage if the current usage is higher
+    peakCpuUsage = std::max(peakCpuUsage, cpuUsage);
+
+CaptureCpuUsage();
 }
 
 void ScaleDown(int32_t size, intType *inArr, int32_t sf) {
+
+
+    // Start timing
+    auto startWallTime = std::chrono::high_resolution_clock::now();
+    long startCpuTime = GetCpuTime();
+
 #ifdef LOG_LAYERWISE
   INIT_ALL_IO_DATA_SENT;
   INIT_TIMER;
@@ -1388,20 +1794,91 @@ void ScaleDown(int32_t size, intType *inArr, int32_t sf) {
   delete[] outp;
   if (size != eightDivElemts)
     delete[] tempInp;
+
+
+// Stop timing
+    auto endWallTime = std::chrono::high_resolution_clock::now();
+    long endCpuTime = GetCpuTime();
+
+    // Calculate elapsed times
+    std::chrono::duration<double> elapsedWallTime = endWallTime - startWallTime;
+    double elapsedCpuTime = static_cast<double>(endCpuTime - startCpuTime) / sysconf(_SC_CLK_TCK);
+
+    // Calculate and store CPU usage for this segment
+    double cpuUsage = (elapsedCpuTime / (elapsedWallTime.count() * numCores)) * 100.0;
+    segmentCpuUsages.push_back(cpuUsage);
+
+    // Update peak CPU usage if the current usage is higher
+    peakCpuUsage = std::max(peakCpuUsage, cpuUsage);
+
+CaptureCpuUsage();
 }
 
 void ScaleUp(int32_t size, intType *arr, int32_t sf) {
-  for (int i = 0; i < size; i++) {
+ 
+    // Start timing
+    auto startWallTime = std::chrono::high_resolution_clock::now();
+    long startCpuTime = GetCpuTime();
+
+
+ for (int i = 0; i < size; i++) {
 #ifdef SCI_OT
     arr[i] = (arr[i] << sf);
 #else
     arr[i] = sci::neg_mod(arr[i] << sf, (int64_t)prime_mod);
 #endif
   }
+// Stop timing
+    auto endWallTime = std::chrono::high_resolution_clock::now();
+    long endCpuTime = GetCpuTime();
+
+    // Calculate elapsed times
+    std::chrono::duration<double> elapsedWallTime = endWallTime - startWallTime;
+    double elapsedCpuTime = static_cast<double>(endCpuTime - startCpuTime) / sysconf(_SC_CLK_TCK);
+
+    // Calculate and store CPU usage for this segment
+    double cpuUsage = (elapsedCpuTime / (elapsedWallTime.count() * numCores)) * 100.0;
+    segmentCpuUsages.push_back(cpuUsage);
+
+    // Update peak CPU usage if the current usage is higher
+    peakCpuUsage = std::max(peakCpuUsage, cpuUsage);
+
+CaptureCpuUsage();
 }
 
+
+void PerformComputation() {
+    // Your computation code goes here
+    for (int i = 0; i < 1e7; ++i) {
+        // Example loop simulating computation
+    }
+}
+
+
+
+double EstimateEnergyConsumption(double cpuUsage, double elapsedTimeSeconds) {
+    // Assumed average power consumption of the VM in watts
+    // You should adjust this value based on measurements from `powerstat` or `turbostat`
+    double averagePowerWatts = 20.0;
+
+    // Estimated energy used in joules: Power (W) * Time (s)
+    double estimatedEnergyJoules = averagePowerWatts * cpuUsage * elapsedTimeSeconds;
+    return estimatedEnergyJoules;
+}
+
+
+
+
 void StartComputation() {
-  assert(bitlength < 64 && bitlength > 0);
+//numCores = std::thread::hardware_concurrency();
+segmentCpuUsages.clear();
+    std::cout << "Number of CPU cores: " << numCores << std::endl;
+
+    // Start measuring CPU time and wall time
+    startWallTime = std::chrono::high_resolution_clock::now();
+    startCpuTime = GetCpuTime(); 
+
+ assert(bitlength < 64 && bitlength > 0);
   assert(num_threads <= MAX_THREADS);
 
   std::string backend;
@@ -1584,6 +2061,33 @@ void StartComputation() {
 }
 
 void EndComputation() {
+  auto endWallTime = std::chrono::high_resolution_clock::now();
+    long endCpuTime = GetCpuTime();
+
+    // Calculate elapsed times
+
+    std::chrono::duration<double> elapsedWallTime = endWallTime - startWallTime;
+    double elapsedCpuTime = static_cast<double>(endCpuTime - startCpuTime) / sysconf(_SC_CLK_TCK);
+    
+
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsedTime = end - start;
+
+    // Calculate CPU usage percentage
+    double cpuUsage = (elapsedCpuTime / (elapsedWallTime.count() * numCores)) * 100.0;
+
+    // Output results
+    std::cout << "Elapsed wall time: " << elapsedWallTime.count() << " seconds" << std::endl;
+    std::cout << "Elapsed CPU time: " << elapsedCpuTime << " seconds" << std::endl;
+    std::cout << "CPU usage: " << cpuUsage << " %" << std::endl;
+
+    
+std::cout << "Test end computation" << std::endl;
+
+   // Estimate energy consumption
+    double estimatedEnergy = EstimateEnergyConsumption(cpuUsage, elapsedTime.count());
+    std::cout << "Elapsed time: " << elapsedTime.count() << " seconds" << std::endl;
+    std::cout << "Estimated energy used: " << estimatedEnergy << " joules" << std::endl;
   auto endTimer = std::chrono::high_resolution_clock::now();
   auto execTimeInMilliSec =
       std::chrono::duration_cast<std::chrono::milliseconds>(endTimer -
@@ -1617,7 +2121,12 @@ void EndComputation() {
               << std::endl;
   }
   std::cout << "------------------------------------------------------\n";
+double totalCpuUsage = std::accumulate(segmentCpuUsages.begin(), segmentCpuUsages.end(), 0.0);
+    double averageCpuUsage = totalCpuUsage / segmentCpuUsages.size();
 
+    std::cout << "Average CPU usage across all segments: " << averageCpuUsage << " %" << std::endl;
+
+std::cout << "Peak CPU usage during computation: " << peakCpuUsage << " %" << std::endl;
 #ifdef LOG_LAYERWISE
   std::cout << "Total time in Conv = " << (ConvTimeInMilliSec / 1000.0)
             << " seconds." << std::endl;
@@ -1733,41 +2242,91 @@ void EndComputation() {
     std::cout << "Conv data (sent+received) = "
               << ((ConvCommSent + ConvCommSentClient) / (1.0 * (1ULL << 20)))
               << " MiB." << std::endl;
+
+  std::cout << "Conv data sent = "
+            << ((ConvCommSentClient) / (1.0 * (1ULL << 20))) << " MiB."
+            << std::endl;
+
     std::cout << "MatMul data (sent+received) = "
               << ((MatMulCommSent + MatMulCommSentClient) /
                   (1.0 * (1ULL << 20)))
               << " MiB." << std::endl;
+
+     std::cout << "MatMul data sent = "
+            << ((MatMulCommSentClient) / (1.0 * (1ULL << 20))) << " MiB."
+            << std::endl;
+
     std::cout << "BatchNorm data (sent+received) = "
               << ((BatchNormCommSent + BatchNormCommSentClient) /
                   (1.0 * (1ULL << 20)))
               << " MiB." << std::endl;
+
+     std::cout << "BatchNorm data sent = "
+            << ((BatchNormCommSentClient) / (1.0 * (1ULL << 20))) << " MiB."
+            << std::endl;
+
     std::cout << "Truncation data (sent+received) = "
               << ((TruncationCommSent + TruncationCommSentClient) /
                   (1.0 * (1ULL << 20)))
               << " MiB." << std::endl;
+
+
+     std::cout << "Truncation data sent = "
+            << ((TruncationCommSentClient) / (1.0 * (1ULL << 20))) << " MiB."
+            << std::endl;
     std::cout << "Relu data (sent+received) = "
               << ((ReluCommSent + ReluCommSentClient) / (1.0 * (1ULL << 20)))
               << " MiB." << std::endl;
+
+
+     std::cout << "Relu data sent = "
+            << ((ReluCommSentClient) / (1.0 * (1ULL << 20))) << " MiB."
+            << std::endl;
+
+
     std::cout << "Maxpool data (sent+received) = "
               << ((MaxpoolCommSent + MaxpoolCommSentClient) /
                   (1.0 * (1ULL << 20)))
               << " MiB." << std::endl;
+
+     std::cout << "Maxpool data sent = "
+            << ((MaxpoolCommSentClient) / (1.0 * (1ULL << 20))) << " MiB."
+            << std::endl;
+
     std::cout << "Avgpool data (sent+received) = "
               << ((AvgpoolCommSent + AvgpoolCommSentClient) /
                   (1.0 * (1ULL << 20)))
               << " MiB." << std::endl;
+
+     std::cout << "Avgpool data sent = "
+            << ((AvgpoolCommSentClient) / (1.0 * (1ULL << 20))) << " MiB."
+            << std::endl;
+
     std::cout << "ArgMax data (sent+received) = "
               << ((ArgMaxCommSent + ArgMaxCommSentClient) /
                   (1.0 * (1ULL << 20)))
               << " MiB." << std::endl;
+
+     std::cout << "ArgMax data sent = "
+            << ((ArgMaxCommSentClient) / (1.0 * (1ULL << 20))) << " MiB."
+            << std::endl;
     std::cout << "MatAdd data (sent+received) = "
               << ((MatAddCommSent + MatAddCommSentClient) /
                   (1.0 * (1ULL << 20)))
               << " MiB." << std::endl;
+
+
+     std::cout << "MatAdd data sent = "
+            << ((MatAddCommSentClient) / (1.0 * (1ULL << 20))) << " MiB."
+            << std::endl;
     std::cout << "MatAddBroadCast data (sent+received) = "
               << ((MatAddBroadCastCommSent + MatAddBroadCastCommSentClient) /
                   (1.0 * (1ULL << 20)))
               << " MiB." << std::endl;
+     std::cout << "MatAddBroadCast data sent = "
+            << (MatAddBroadCastCommSentClient) / (1.0 * (1ULL << 20)) << " MiB."
+            << std::endl;
+
     std::cout << "MulCir data (sent+received) = "
               << ((MulCirCommSent + MulCirCommSentClient) /
                   (1.0 * (1ULL << 20)))

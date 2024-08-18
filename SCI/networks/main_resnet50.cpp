@@ -7260,22 +7260,22 @@ int main(int argc, char **argv) {
   ClearMemPublic(tmp779);
   EndComputation();
 
-  std::vector<double> prediction_vector(1001);
-  for (uint64_t i0 = 0; i0 < 1001; i0++) {
-	prediction_vector[i0] = funcReconstruct2PCCons(Arr1DIdxRowM(tmp776, 1001, i0), 2) 
-	  / std::pow(4., kScale);
-  }
-  ClearMemSecret2((int32_t)1, (int32_t)1001, tmp776);
-  if (party == CLIENT) {
-	std::sort(prediction_vector.begin(), prediction_vector.end(), 
-			  [](double u, double v) { return u > v; });
-	printf("top-10 values from ResNet50\n");
-	printf("[");
-	for (uint64_t i = 0; i < 10; ++i) {
-	  printf("%.7f,", prediction_vector[i]);
-	}
-	printf("]\n");
-  }
+//  std::vector<double> prediction_vector(1001);
+//  for (uint64_t i0 = 0; i0 < 1001; i0++) {
+//	prediction_vector[i0] = funcReconstruct2PCCons(Arr1DIdxRowM(tmp776, 1001, i0), 2) 
+//	  / std::pow(4., kScale);
+//  }
+//  ClearMemSecret2((int32_t)1, (int32_t)1001, tmp776);
+//  if (party == CLIENT) {
+//	std::sort(prediction_vector.begin(), prediction_vector.end(), 
+//			  [](double u, double v) { return u > v; });
+//	printf("top-10 values from ResNet50\n");
+//	printf("[");
+//	for (uint64_t i = 0; i < 10; ++i) {
+//	  printf("%.7f,", prediction_vector[i]);
+//	}
+//	printf("]\n");
+ // }
 
   for (uint64_t i0 = (uint64_t)0; i0 < (int32_t)1; i0++) {
 	auto pred = funcReconstruct2PCCons(Arr1DIdxRowM(tmp780, 1, i0), 2);

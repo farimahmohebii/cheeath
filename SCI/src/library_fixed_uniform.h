@@ -73,7 +73,11 @@ void BatchNorm(int32_t B, int32_t H, int32_t W, int32_t C,
 #endif
 
 void ArgMax(int32_t s1, int32_t s2, intType *inArr, intType *outArr);
+void Max(int32_t size, intType *inArr, int32_t alpha, intType *outArr, int32_t sf, bool doTruncation);
 
+void Min(int32_t size, intType *inArr, int32_t alpha, intType *outArr, int32_t sf, bool doTruncation);
+
+void HardSigmoid(int32_t size, intType *inArr, intType *outArr, int32_t sf, bool doTruncation);
 void Relu(int32_t size, intType *inArr, intType *outArr, int sf,
           bool doTruncation);
 

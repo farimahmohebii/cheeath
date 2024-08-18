@@ -1,4 +1,4 @@
-. scripts/common.sh
+\. scripts/common.sh
 
 for deps in eigen3 emp-ot emp-tool hexl SEAL-3.7
 do
@@ -20,8 +20,12 @@ done
 
 cd $BUILD_DIR/
 cmake .. -DCMAKE_BUILD_TYPE=Release -DSCI_BUILD_NETWORKS=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl -DCMAKE_PREFIX_PATH=$BUILD_DIR -DUSE_APPROX_RESHARE=ON
-for net in resnet50 sqnet densenet121
+for net in resnet50 sqnet densenet121 alexnet resnet101 resnet18 SqueezeNetCIFAR10 densenet169 shufflenetv2 lenet lenet-large
 do
-     make ${net}-cheetah -j4 
-     make ${net}-SCI_HE -j4 
+     make ${net}-cheetah -j4  
+done
+
+for net in resnet50 sqnet densenet121 alexnet resnet101 mnasnet SqueezeNetCIFAR10 ffnn128 densenet169 shufflenetv2 lenet lenet-large
+do
+     make ${net}-SCI_HE -j4
 done

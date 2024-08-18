@@ -5,6 +5,11 @@ Then hand crafted by Wen-jie Lu
 
 #include "library_fixed.h"
 #include <iostream>
+#include <chrono>
+#include <fstream>
+#include <string>
+#include <sstream>
+#include <vector>
 using namespace std;
 
 int party = 0;
@@ -13,6 +18,13 @@ string address = "127.0.0.1";
 int num_threads = 4;
 int32_t bitlength = 32;
 int32_t kScale = 12;
+
+
+
+
+
+
+
 
 void MatAddBroadCast2(int64_t s1, int64_t s2, uint64_t *A, uint64_t *B,
                       uint64_t *outArr) {
@@ -3827,5 +3839,6 @@ int main(int argc, char **argv) {
       }
     }
   }
-  finalize();
+
+    ClearMemSecret4(1, 1, 1, 1, tmp302);
 }
